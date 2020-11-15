@@ -13,17 +13,19 @@ from scipy.special import comb
 import datetime as dt
 import matplotlib.dates as mdates
 
+
 def sort_tupple(tup):  
     """return a tupple sorted by second element"""
     lst = len(tup)  
     for i in range(0, lst):  
           
         for j in range(0, lst-i-1):  
-            if (tup[j][1] > tup[j + 1][1]):  
+            if tup[j][1] > tup[j + 1][1]:
                 temp = tup[j]  
                 tup[j]= tup[j + 1]  
                 tup[j + 1]= temp  
     return tup  
+
 
 def get_full_path(core_path):
 
@@ -52,34 +54,34 @@ def get_full_path(core_path):
         # with rasterio.open(i+images[0][0:23]+ 'B02_10m.jp2', driver='JP2OpenJPEG')  as blue:
         #     BLUE = blue.read()   
         ndvi = (NIR.astype(float)-RED.astype(float))/((NIR.astype(float)+RED.astype(float)))
-        #evi = 2.5*(NIR.astype(float) - RED.astype(float)) / (NIR.astype(float)+(6*RED.astype(float))-(7.5*BLUE.astype(float))+1)
+        # evi = 2.5*(NIR.astype(float) - RED.astype(float)) / (NIR.astype(float)+(6*RED.astype(float))-(7.5*BLUE.astype(float))+1)
 
         profile = red.meta
         profile.update(driver='GTiff')
         profile.update(dtype=rasterio.float32)
   
-        with rasterio.open('/Volumes/My Passport/Konrad/NDVI_results/'+images[0][0:23]+ 'NDVI.TIFF', 'w', **profile) as dst:
+        with rasterio.open('/Volumes/Konrad Jarocki/Vineyard_Sentinel2/results/NDVI/full_Italy/'+images[0][0:23]+ '0.NDVI.TIFF', 'w', **profile) as dst:
             
             dst.write(ndvi.astype(rasterio.float32))
+        print(images[0][0:23])
+        # with fiona.open("/Users/konradjarocki/repos/Vineyard_Sentinel-2/Masks/Areas/Italy/Italy_WGS_2.shp", "r") as shapefile:
+        #     shapes = [feature["geometry"] for feature in shapefile]
+        #
+        # with rasterio.open('/Volumes/Konrad Jarocki/Vineyard_Sentinel2/results/NDVI/full_Italy/'+images[0][0:23]+ '_NDVI.TIFF', 'r') as src:
+        #     for shape in shapes:
+        #
+        #         print(src.crs, shape)
+        #     out_image, out_transform = rasterio.mask.mask(src, shapes, crop=True, filled = True)
+        #     out_meta = src.meta
+        #
+        # out_meta.update({"driver": "GTiff", "height": out_image.shape[1],
+        #                  "width": out_image.shape[2], "transform": out_transform})
+        # out_image[out_image == 0] = np.nan
+        #
+        # with rasterio.open('/Volumes/Konrad Jarocki/Vineyard_Sentinel2/results/NDVI/cropped_Italy/c'+images[0][0:23]+ '_NDVI.TIFF', 'w', **out_meta) as dst:
+        #
+        #     dst.write(out_image.astype(rasterio.float32))
 
-
-        with fiona.open("area.shp", "r") as shapefile:
-            shapes = [feature["geometry"] for feature in shapefile]
-
-
-        with rasterio.open('/Volumes/My Passport/Konrad/NDVI_results/'+images[0][0:23]+ 'NDVI.TIFF', 'r') as src:
-            out_image, out_transform = rasterio.mask.mask(src, shapes, crop=True, filled = True)
-            out_meta = src.meta
-
-        out_meta.update({"driver": "GTiff", "height": out_image.shape[1], "width": out_image.shape[2], "transform": out_transform})
-        out_image[out_image == 0] = np.nan
-
-        with rasterio.open('/Volumes/My Passport/Konrad/NDVI_results/c'+images[0][0:23]+ 'NDVI.TIFF', 'w', **out_meta) as dst:
-
-            dst.write(out_image.astype(rasterio.float32))
-
-
-            
 
 def get_histogram(point,fig, ax, name, deg = 13):
     
@@ -108,9 +110,7 @@ def get_histogram(point,fig, ax, name, deg = 13):
     
     coefficients = np.polyfit(x, y, deg)
 
-
     poly = np.poly1d(coefficients)
-
 
     new_x = np.linspace(x[0], x[-1], 200)
     new_x2 = np.linspace(x2[0], x2[-1], 200)
@@ -152,7 +152,6 @@ def get_histogram_bezier(point,fig, ax, name, deg = 13):
     data = np.column_stack([x,y])
     xvals, yvals = bezier_curve(data, nTimes=1000)
 
-  
     ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday = 1))
     ax.plot(xvals, yvals, label=name)
     ax.legend()
@@ -180,12 +179,15 @@ def crop_with_surrounding():
             with rasterio.open('/Volumes/My Passport/Konrad/Cropped2/a' + file, 'w', **out_meta) as dst:
 
                 dst.write(out_image.astype(rasterio.float32))
+
+
 def bernstein_poly(i, n, t):
     """
      The Bernstein polynomial of n, i as a function of t
     """
 
-    return comb(n, i) * ( t**(n-i) ) * (1 - t)**i
+    return comb(n, i) * (t**(n-i)) * (1 - t)**i
+
 
 def bezier_curve(points, nTimes=50):
   
@@ -202,48 +204,51 @@ def bezier_curve(points, nTimes=50):
 
     return xvals, yvals
 
-point = (356215,6219780) # Forest
-point11 = (356853.2,6219669.7) # Field 1 Point 1
-point12 = (356903.8,6219769.2) # Field 1 Point 2
-point13 = (356997.2,6219861.6) # Field 1 Point 3
-point21 = (356996.3,6219741.2) # Field 2 Point 4
-point22 = (357011.0,6219686.4) # Field 2 Point 5
-point23 = (356946.3,6219691.3) # Field 2 Point 6
-point4 = (359263.3,6217037.4) # Building
 
-fig, ax = plt.subplots()
-get_histogram(point,fig, ax, 'Forest' )
-get_histogram(point11,fig, ax, 'Point 1 (Cult. 1)' )
-get_histogram(point12,fig, ax, 'Point 2 (Cult. 1)' )
-get_histogram(point13,fig, ax, 'Point 3 (Cult. 1)' )
-get_histogram(point21,fig, ax, 'Point 4 (Cult. 2)' )
-get_histogram(point22,fig, ax, 'Point 5 (Cult. 2)' )
-get_histogram(point23,fig, ax, 'Point 6 (Cult. 2)' )
-
-get_histogram(point4,fig, ax, 'Building', 8 )
-
-plt.title('Normalized difference vegetation index (NDVI).')
-plt.show()
-
-point = (356215,6219780) # Forest
-point11 = (356853.2,6219669.7) # Field 1 Point 1
-point12 = (356903.8,6219769.2) # Field 1 Point 2
-point13 = (356997.2,6219861.6) # Field 1 Point 3
-point21 = (356996.3,6219741.2) # Field 2 Point 4
-point22 = (357011.0,6219686.4) # Field 2 Point 5
-point23 = (356946.3,6219691.3) # Field 2 Point 6
-point4 = (359263.3,6217037.4) # Building
-
-fig, ax = plt.subplots()
-get_histogram_bezier(point,fig, ax, 'Forest' )
-get_histogram_bezier(point11,fig, ax, 'Point 1 (Cult. 1)' )
-get_histogram_bezier(point12,fig, ax, 'Point 2 (Cult. 1)' )
-get_histogram_bezier(point13,fig, ax, 'Point 3 (Cult. 1)' )
-get_histogram_bezier(point21,fig, ax, 'Point 4 (Cult. 2)' )
-get_histogram_bezier(point22,fig, ax, 'Point 5 (Cult. 2)' )
-get_histogram_bezier(point23,fig, ax, 'Point 6 (Cult. 2)' )
-
-get_histogram_bezier(point4,fig, ax, 'Building', 8 )
-
-plt.title('Normalized difference vegetation index (NDVI).')
-plt.show()
+# point = (356215,6219780) # Forest
+# point11 = (356853.2,6219669.7) # Field 1 Point 1
+# point12 = (356903.8,6219769.2) # Field 1 Point 2
+# point13 = (356997.2,6219861.6) # Field 1 Point 3
+# point21 = (356996.3,6219741.2) # Field 2 Point 4
+# point22 = (357011.0,6219686.4) # Field 2 Point 5
+# point23 = (356946.3,6219691.3) # Field 2 Point 6
+# point4 = (359263.3,6217037.4) # Building
+#
+# fig, ax = plt.subplots()
+# get_histogram(point,fig, ax, 'Forest' )
+# get_histogram(point11,fig, ax, 'Point 1 (Cult. 1)' )
+# get_histogram(point12,fig, ax, 'Point 2 (Cult. 1)' )
+# get_histogram(point13,fig, ax, 'Point 3 (Cult. 1)' )
+# get_histogram(point21,fig, ax, 'Point 4 (Cult. 2)' )
+# get_histogram(point22,fig, ax, 'Point 5 (Cult. 2)' )
+# get_histogram(point23,fig, ax, 'Point 6 (Cult. 2)' )
+#
+# get_histogram(point4,fig, ax, 'Building', 8 )
+#
+# plt.title('Normalized difference vegetation index (NDVI).')
+# plt.show()
+#
+# point = (356215,6219780) # Forest
+# point11 = (356853.2,6219669.7) # Field 1 Point 1
+# point12 = (356903.8,6219769.2) # Field 1 Point 2
+# point13 = (356997.2,6219861.6) # Field 1 Point 3
+# point21 = (356996.3,6219741.2) # Field 2 Point 4
+# point22 = (357011.0,6219686.4) # Field 2 Point 5
+# point23 = (356946.3,6219691.3) # Field 2 Point 6
+# point4 = (359263.3,6217037.4) # Building
+#
+# fig, ax = plt.subplots()
+# get_histogram_bezier(point,fig, ax, 'Forest' )
+# get_histogram_bezier(point11,fig, ax, 'Point 1 (Cult. 1)' )
+# get_histogram_bezier(point12,fig, ax, 'Point 2 (Cult. 1)' )
+# get_histogram_bezier(point13,fig, ax, 'Point 3 (Cult. 1)' )
+# get_histogram_bezier(point21,fig, ax, 'Point 4 (Cult. 2)' )
+# get_histogram_bezier(point22,fig, ax, 'Point 5 (Cult. 2)' )
+# get_histogram_bezier(point23,fig, ax, 'Point 6 (Cult. 2)' )
+#
+# get_histogram_bezier(point4,fig, ax, 'Building', 8 )
+#
+# plt.title('Normalized difference vegetation index (NDVI).')
+# plt.show()
+get_full_path('/Volumes/Konrad Jarocki/Vineyard_Sentinel2/Downloads/raw_Italy')
+print('working!')
