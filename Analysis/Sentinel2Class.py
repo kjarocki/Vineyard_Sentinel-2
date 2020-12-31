@@ -29,15 +29,17 @@ def sort_tupple(tup):
 
 class Sentinel2:
 
-    def __init__(self, core_path):
+    def __init__(self, core_path: str):
+
         self.core_path = core_path
-        full_path = self.get_full_path()
+        self.get_full_path()
 
     def get_full_path(self):
-        folders = os.listdir(self.core_path)
-        print(folders)
-        full_paths = []
 
+        folders = os.listdir(self.core_path)
+
+        full_paths = []
+        
         for folder in folders:
             if folder[0] == 'S':
                 path = self.core_path + '/' + folder + '/GRANULE/'
@@ -69,14 +71,14 @@ class Sentinel2:
             profile.update(dtype=rasterio.float32)
 
             with rasterio.open(
-                    '/Volumes/Konrad Jarocki/Vineyard_Sentinel2/results/NDVI/full_Italy/' + images[0][0:23] + '0.NDVI.TIFF',
+                    '/Volumes/Konrad Jarocki/Vineyard_Sentinel2/Results/NDVI/full_Italy/' + images[0][0:23] + '0.NDVI.TIFF',
                     'w', **profile) as dst:
                 dst.write(ndvi.astype(rasterio.float32))
             print(images[0][0:23])
         # with fiona.open("/Users/konradjarocki/repos/Vineyard_Sentinel-2/Masks/Areas/Italy/Italy_WGS_2.shp", "r") as shapefile:
         #     shapes = [feature["geometry"] for feature in shapefile]
         #
-        # with rasterio.open('/Volumes/Konrad Jarocki/Vineyard_Sentinel2/results/NDVI/full_Italy/'+images[0][0:23]+ '_NDVI.TIFF', 'r') as src:
+        # with rasterio.open('/Volumes/Konrad Jarocki/Vineyard_Sentinel2/Results/NDVI/full_Italy/'+images[0][0:23]+ '_NDVI.TIFF', 'r') as src:
         #     for shape in shapes:
         #
         #         print(src.crs, shape)
@@ -87,7 +89,7 @@ class Sentinel2:
         #                  "width": out_image.shape[2], "transform": out_transform})
         # out_image[out_image == 0] = np.nan
         #
-        # with rasterio.open('/Volumes/Konrad Jarocki/Vineyard_Sentinel2/results/NDVI/cropped_Italy/c'+images[0][0:23]+ '_NDVI.TIFF', 'w', **out_meta) as dst:
+        # with rasterio.open('/Volumes/Konrad Jarocki/Vineyard_Sentinel2/Results/NDVI/cropped_Italy/c'+images[0][0:23]+ '_NDVI.TIFF', 'w', **out_meta) as dst:
         #
         #     dst.write(out_image.astype(rasterio.float32))
 
